@@ -38,6 +38,7 @@ public class mainPCV extends JFrame {
 		createNorthPanel();
 
 		errorPane = new JTextPane();
+		errorPane.setOpaque(false);
 		kit = new HTMLEditorKit();
 		doc = new HTMLDocument();
 		errorPane.setEditorKit(kit);
@@ -45,11 +46,27 @@ public class mainPCV extends JFrame {
 		errorPane.setEditable(false);
 		errorPane.setSize(450, 450);
 		errorPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		
+		JViewport viewport = new JViewport() {
+			
+			public void paintComponent(Graphics og) {
+				super.paintComponent(og);
+				Graphics2D g = (Graphics2D) og;
+				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+						RenderingHints.VALUE_ANTIALIAS_ON);
+				GradientPaint gradient = new GradientPaint(0, 0, new Color(247,
+						237, 204), 0, getHeight(), Color.white, true);
+				g.setPaint(gradient);
+				g.fillRoundRect(0, 0, getWidth(), getHeight(), 50, 50);
+			}
+		};
+		viewport.add(errorPane);
 
-		scrollPane = new JScrollPane(errorPane);
+		scrollPane = new JScrollPane();
 		scrollPane
 				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-
+		scrollPane.setViewport(viewport);
+		
 		getContentPane().add(northPanel, BorderLayout.NORTH);
 		getContentPane().add(scrollPane, BorderLayout.CENTER);
 	}
@@ -87,7 +104,7 @@ public class mainPCV extends JFrame {
 		northPanel.setPreferredSize(new Dimension(600, 110));
 		northPanel
 				.setBorder(BorderFactory
-						.createTitledBorder("<html><font size = 4> <font color=#088542>Select an Excel File</font color></font></html>"));
+						.createTitledBorder("<html><font size = 4> <font color=#0B612D>Select an Excel File</font color></font></html>"));
 
 		pathTextField = new JTextField();
 		pathTextField.setEditable(false);
