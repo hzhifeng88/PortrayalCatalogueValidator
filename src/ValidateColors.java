@@ -97,8 +97,8 @@ public class ValidateColors {
 
 				char firstChar = tempString.charAt(0);
 
-				// Ensure begins with '#' and is Hexadecimal)
-				if (firstChar != '#' || !tempString.substring(1, tempString.length()).matches("^[\\da-fA-F]+$")) {
+				// Ensure begins with '#', length of 7 and is Hexadecimal)
+				if (firstChar != '#' || tempString.length() != 7 || !tempString.substring(1, tempString.length()).matches("^[\\da-fA-F]+$")) {
 
 					storeInvalidColorRGB.add("B"
 							+ Integer.toString(rowIndex + 1));

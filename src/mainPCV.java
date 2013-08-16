@@ -55,7 +55,7 @@ public class mainPCV extends JFrame {
 				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 						RenderingHints.VALUE_ANTIALIAS_ON);
 				GradientPaint gradient = new GradientPaint(0, 0, new Color(247,
-						237, 204), 0, getHeight(), Color.white, true);
+						237, 204), 0, getHeight(), Color.WHITE, true);
 				g.setPaint(gradient);
 				g.fillRoundRect(0, 0, getWidth(), getHeight(), 50, 50);
 			}
