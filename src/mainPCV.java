@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
@@ -124,6 +125,7 @@ public class mainPCV extends JFrame {
 		northPanel.add(validateButton);
 
 		chooser = new JFileChooser();
+		chooser.setFileFilter(new FileNameExtensionFilter("Excel Files", "xlsx"));
 	}
 
 	public void initializeRead() {

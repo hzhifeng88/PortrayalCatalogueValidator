@@ -22,6 +22,7 @@ public class ValidatePointSymbolizer {
 	private ArrayList<String> storeWrongStyleID = new ArrayList<String>();
 	private ArrayList<String> storeDuplicateStyleID = new ArrayList<String>();
 	private ArrayList<String> storeInvalidColorCells = new ArrayList<String>();
+	private ArrayList<String> storeMissingValueCells = new ArrayList<String>();
 	private HTMLEditorKit kit;
 	private HTMLDocument doc;
 
@@ -41,6 +42,7 @@ public class ValidatePointSymbolizer {
 
 			checkStyleID();
 			checkColorValid();
+			checkMissingAttributes();
 
 			if (storeWrongStyleID.isEmpty() == false
 					|| storeInvalidColorCells.isEmpty() == false
@@ -113,7 +115,7 @@ public class ValidatePointSymbolizer {
 
 		boolean isRowEmpty = false;
 
-		for (int rowCount = 4; rowCount < pointSheet.getLastRowNum(); rowCount++) {
+		for (int rowCount = 4; rowCount <= pointSheet.getLastRowNum(); rowCount++) {
 
 			isRowEmpty = false;
 			Row row = pointSheet.getRow(rowCount);
@@ -244,6 +246,35 @@ public class ValidatePointSymbolizer {
 		}
 	}
 
+	public void checkMissingAttributes(){
+		
+		for (int rowCount = 4; rowCount <= pointSheet.getLastRowNum(); rowCount++) {
+			
+			for(int emptyRowCount = 0; emptyRowCount < storeEmptyRows.size(); emptyRowCount++){
+				
+				if(rowCount == Integer.parseInt(storeEmptyRows.get(emptyRowCount).toString())){
+					break;
+				}
+			}
+			
+			Row row = pointSheet.getRow(rowCount);
+
+			// Checks for mandatory columns here
+			if(row.getCell(0) == null){
+				storeMissingValueCells.add("A" + Integer.toString(rowCount + 1));
+			}
+			
+			if(row.getCell(2) == null){
+				storeMissingValueCells.add("C" + Integer.toString(rowCount + 1));
+			}
+			
+			if(row.getCell(3) == null){
+				storeMissingValueCells.add("D" + Integer.toString(rowCount + 1));
+			}
+		}
+		Collections.sort(storeMissingValueCells);
+	}
+	
 	public void printAllError() {
 
 		try {
@@ -267,8 +298,15 @@ public class ValidatePointSymbolizer {
 			
 			if (storeInvalidColorCells.isEmpty() == false) {
 				
-				kit.insertHTML(doc, doc.getLength(), "<font size = 4> <font color=#0A23C4><b>-> </b><font size = 3> Color is invalid (Rule 1: Begins with '#', Rule 2: hexadecimal representation)</font color></font>", 0, 0,null);
+				kit.insertHTML(doc, doc.getLength(), "<font size = 4> <font color=#0A23C4><b>-> </b><font size = 3> Color is invalid (Rule 1: Begins with '#', Rule 2: 6 hexadecimal representation)</font color></font>", 0, 0,null);
 				kit.insertHTML(doc, doc.getLength(), "<font size = 3> <font color=#0A23C4>Cells: <font color=#ED0E3F>" + storeInvalidColorCells + "</font color></font>", 0, 0, null);
+
+			}
+			
+			if (storeMissingValueCells.isEmpty() == false) {
+				
+				kit.insertHTML(doc, doc.getLength(), "<font size = 4> <font color=#0A23C4><b>-> </b><font size = 3> Missing values found (Mandatory)</font color></font>", 0, 0,null);
+				kit.insertHTML(doc, doc.getLength(), "<font size = 3> <font color=#0A23C4>Cells: <font color=#ED0E3F>" + storeMissingValueCells + "</font color></font>", 0, 0, null);
 
 			}
 		} catch (BadLocationException e) {
