@@ -35,6 +35,8 @@ public class ValidatePolygonSymbolizer {
 		if (storeWrongStyleID.isEmpty() == false
 				|| storeInvalidColorCells.isEmpty() == false
 				|| storeDuplicateStyleID.isEmpty() == false) {
+			
+			Collections.sort(storeInvalidColorCells);
 			printAllError();
 		}
 	}
@@ -81,9 +83,9 @@ public class ValidatePolygonSymbolizer {
 								storeDuplicateStyleID.add("F" + Integer.toString(rowIndex + 1));
 								foundDuplicate = true;
 								break;
-								
 							} 
 						}
+						
 						if(foundDuplicate == false){
 							storeRightStyleID.add(tempString);
 						}
@@ -106,7 +108,6 @@ public class ValidatePolygonSymbolizer {
 				matchColor(row.getCell(16).toString(), 16, rowIndex);
 
 			}
-			Collections.sort(storeInvalidColorCells);
 		}
 
 		public void matchColor(String tempStringColor, int columnNum, int rowIndex) {
@@ -122,7 +123,6 @@ public class ValidatePolygonSymbolizer {
 					return;
 				}
 			}
-
 			if (columnNum == 10) {
 				storeInvalidColorCells.add("K" + Integer.toString(rowIndex + 1));
 			} else if (columnNum == 16) {

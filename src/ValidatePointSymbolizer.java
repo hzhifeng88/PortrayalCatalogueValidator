@@ -46,7 +46,12 @@ public class ValidatePointSymbolizer {
 
 			if (storeWrongStyleID.isEmpty() == false
 					|| storeInvalidColorCells.isEmpty() == false
-					|| storeDuplicateStyleID.isEmpty() == false) {
+					|| storeDuplicateStyleID.isEmpty() == false
+					|| storeMissingValueCells.isEmpty() == false) {
+				
+				Collections.sort(storeMergedCells);
+				Collections.sort(storeInvalidColorCells);
+				Collections.sort(storeMissingValueCells);
 				printAllError();
 			}
 
@@ -70,7 +75,6 @@ public class ValidatePointSymbolizer {
 					kit.insertHTML(doc, doc.getLength(), "<font size = 3> <font color=#0A23C4>Row number: <font color=#ED0E3F>" + storeEmptyRows + "</font color></font>", 0, 0, null);
 
 				}
-				
 			} catch (BadLocationException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -107,7 +111,7 @@ public class ValidatePointSymbolizer {
 				storeMergedCells.add(cell);
 			}
 		}
-		Collections.sort(storeMergedCells);
+		
 		return storeMergedCells;
 	}
 
@@ -197,9 +201,9 @@ public class ValidatePointSymbolizer {
 										+ Integer.toString(rowIndex + 1));
 								foundDuplicate = true;
 								break;
-
 							}
 						}
+						
 						if (foundDuplicate == false) {
 							storeRightStyleID.add(tempString);
 						}
@@ -222,7 +226,6 @@ public class ValidatePointSymbolizer {
 			matchColor(row.getCell(23).toString(), 23, rowIndex);
 
 		}
-		Collections.sort(storeInvalidColorCells);
 	}
 
 	public void matchColor(String tempStringColor, int columnNum, int rowIndex) {
@@ -234,7 +237,6 @@ public class ValidatePointSymbolizer {
 
 			if (tempStringColor.equalsIgnoreCase(cObject.getColorID())
 					|| tempStringColor.equalsIgnoreCase(cObject.getsRGB())) {
-
 				return;
 			}
 		}
@@ -272,7 +274,6 @@ public class ValidatePointSymbolizer {
 				storeMissingValueCells.add("D" + Integer.toString(rowCount + 1));
 			}
 		}
-		Collections.sort(storeMissingValueCells);
 	}
 	
 	public void printAllError() {

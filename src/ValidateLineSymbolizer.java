@@ -35,6 +35,8 @@ public class ValidateLineSymbolizer {
 		if (storeWrongStyleID.isEmpty() == false
 				|| storeInvalidColorCells.isEmpty() == false
 				|| storeDuplicateStyleID.isEmpty() == false) {
+			
+			Collections.sort(storeInvalidColorCells);
 			printAllError();
 		}
 	}
@@ -81,9 +83,9 @@ public class ValidateLineSymbolizer {
 								storeDuplicateStyleID.add("F" + Integer.toString(rowIndex + 1));
 								foundDuplicate = true;
 								break;
-								
 							} 
 						}
+						
 						if(foundDuplicate == false){
 							storeRightStyleID.add(tempString);
 						}
@@ -106,7 +108,7 @@ public class ValidateLineSymbolizer {
 			matchColor(row.getCell(25).toString(), 25, rowIndex);
 
 		}
-		Collections.sort(storeInvalidColorCells);
+		
 	}
 
 	public void matchColor(String tempStringColor, int columnNum, int rowIndex) {

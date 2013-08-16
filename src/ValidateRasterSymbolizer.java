@@ -73,9 +73,9 @@ public class ValidateRasterSymbolizer {
 								storeDuplicateStyleID.add("F" + Integer.toString(rowIndex + 1));
 								foundDuplicate = true;
 								break;
-								
 							} 
 						}
+						
 						if(foundDuplicate == false){
 							storeRightStyleID.add(tempString);
 						}
@@ -105,8 +105,6 @@ public class ValidateRasterSymbolizer {
 				kit.insertHTML(doc, doc.getLength(), "<font size = 3> <font color=#0A23C4>Cells: <font color=#ED0E3F>" + storeDuplicateStyleID + "</font color></font>", 0, 0, null);
 
 			}
-			
-			
 		} catch (BadLocationException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

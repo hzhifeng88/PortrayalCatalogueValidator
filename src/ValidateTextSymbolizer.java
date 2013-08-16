@@ -34,6 +34,7 @@ public class ValidateTextSymbolizer {
 		if (storeWrongStyleID.isEmpty() == false
 				|| storeInvalidColorCells.isEmpty() == false
 				|| storeDuplicateStyleID.isEmpty() == false) {
+			
 			printAllError();
 		}
 	}
@@ -80,9 +81,9 @@ public class ValidateTextSymbolizer {
 								storeDuplicateStyleID.add("F" + Integer.toString(rowIndex + 1));
 								foundDuplicate = true;
 								break;
-								
 							} 
 						}
+						
 						if(foundDuplicate == false){
 							storeRightStyleID.add(tempString);
 						}
