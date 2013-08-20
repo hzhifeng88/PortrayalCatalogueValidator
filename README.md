@@ -7,6 +7,7 @@ Specifications implemented:
 2. Sheets with Color column(s) have valid colors (corresponds with the Colors Sheet). 
 
 3. Implement format check for Colors Sheet sRGB column. 
+
 * Values must begin with '#' 
 * Have a length of 7 (inclusive of '#') 
 * Values must be Hexadecimal (from position 1) 
