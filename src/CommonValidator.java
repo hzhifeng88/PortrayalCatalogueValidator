@@ -106,7 +106,7 @@ public class CommonValidator {
 		}
 	}
 	
-	public String columnIndexToLetterNotation(int columnIndex) { 
+	public String columnIndexToLetter(int columnIndex) { 
   
 		int base = 26;   
 		StringBuffer b = new StringBuffer(); 
@@ -137,14 +137,14 @@ public class CommonValidator {
 				}
 
 				if(row.getCell(columnIndex) != null && originalRow.getCell(columnIndex) == null){
-					storeModifiedHeaderCells.add(columnIndexToLetterNotation(columnIndex) + Integer.toString(rowIndex + 1));
+					storeModifiedHeaderCells.add(columnIndexToLetter(columnIndex) + Integer.toString(rowIndex + 1));
 					continue;
 				}
 						
 				if(row.getCell(columnIndex).toString().equalsIgnoreCase(originalRow.getCell(columnIndex).toString())){
 					continue;
 				}else {
-					storeModifiedHeaderCells.add(columnIndexToLetterNotation(columnIndex) + Integer.toString(rowIndex + 1));
+					storeModifiedHeaderCells.add(columnIndexToLetter(columnIndex) + Integer.toString(rowIndex + 1));
 				}
 			}
 		}
@@ -160,7 +160,6 @@ public class CommonValidator {
 	public void checkIDAndDuplicate(char idAlphabet, String column, int rowIndex, int columnIndex){
 		
 		boolean wrongStyleID = false;
-		boolean foundDuplicate = false;
 		this.idAlphabet = idAlphabet;
 
 		Row row = sheet.getRow(rowIndex);
@@ -186,15 +185,9 @@ public class CommonValidator {
 						storeRightID.add(tempString);
 					} else {
 
-						for (int count = 0; count < storeRightID.size(); count++) {
-
-							if (storeRightID.get(count).equalsIgnoreCase(tempString)) {
-								storeDuplicateID.add(column + Integer.toString(rowIndex + 1));
-								foundDuplicate = true;
-							}
-						}
-						
-						if (foundDuplicate == false) {
+						if(storeRightID.contains(tempString)){
+							storeDuplicateID.add(column + Integer.toString(rowIndex + 1));
+						}else{
 							storeRightID.add(tempString);
 						}
 					}
@@ -224,42 +217,27 @@ public class CommonValidator {
 
 		checkLineBreak(tempStringColor, currentColumn, rowIndex);
 		
-		for (int count = 0; count < storeColorID.size(); count++) {
-			
-			if(tempStringColor.equalsIgnoreCase(storeColorID.get(count))){
-				return;
-			}else if(isRGB(tempStringColor) == true){
-				return;
-			}
+		if(storeColorID.contains(tempStringColor)){
+			return;
+		}else if(isRGB(tempStringColor) == true){
+			return;
 		}
 		storeInvalidColorCells.add(currentColumn + Integer.toString(rowIndex + 1));
 	}
 	
-	public void checkMissingAttributes(){
+	public void checkMissingAttributes(Row row, int rowIndex){
 		
-		for (int rowCount = 4; rowCount <= sheet.getLastRowNum(); rowCount++) {
+		// Checks for mandatory columns here
+		if(row.getCell(0) == null || row.getCell(2).toString().equalsIgnoreCase("")){
+			storeMissingValueCells.add("A" + Integer.toString(rowIndex + 1));
+		}
 			
-			for(int emptyRowCount = 0; emptyRowCount < storeEmptyRows.size(); emptyRowCount++){
-				
-				if(rowCount == Integer.parseInt(storeEmptyRows.get(emptyRowCount).toString())){
-					break;
-				}
-			}
+		if(row.getCell(2) == null || row.getCell(2).toString().equalsIgnoreCase("")){
+			storeMissingValueCells.add("C" + Integer.toString(rowIndex + 1));
+		}
 			
-			Row row = sheet.getRow(rowCount);
-
-			// Checks for mandatory columns here
-			if(row.getCell(0) == null){
-				storeMissingValueCells.add("A" + Integer.toString(rowCount + 1));
-			}
-			
-			if(row.getCell(2) == null){
-				storeMissingValueCells.add("C" + Integer.toString(rowCount + 1));
-			}
-			
-			if(row.getCell(3) == null){
-				storeMissingValueCells.add("D" + Integer.toString(rowCount + 1));
-			}
+		if(row.getCell(3) == null || row.getCell(2).toString().equalsIgnoreCase("")){
+			storeMissingValueCells.add("D" + Integer.toString(rowIndex + 1));
 		}
 	}
 

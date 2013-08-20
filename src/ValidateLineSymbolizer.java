@@ -21,30 +21,26 @@ public class ValidateLineSymbolizer extends CommonValidator{
 		
 		if (printFormatError() == false) {
 			checkModifiedHeader();
-			checkStyleID();
-			checkColorValid();
-			checkMissingAttributes();
+			performChecks();
 			printValueError();
 		}
 	}
-
-	public void checkStyleID() {
+	
+	public void performChecks() {
 
 		for (int rowIndex = 4; rowIndex <= lineSheet.getLastRowNum(); rowIndex++) {
 
-			checkIDAndDuplicate('L', "F", rowIndex, 5);
-		}
-	}
-
-	public void checkColorValid() {
-
-		int rowIndex;
-
-		for (rowIndex = 4; rowIndex <= lineSheet.getLastRowNum(); rowIndex++) {
-
 			Row row = lineSheet.getRow(rowIndex);
+			
+			// Check valid ID and duplicate
+			checkIDAndDuplicate('L', "F", rowIndex, 5);
+			
+			// Check color valid
 			matchColor(row.getCell(9).toString(), "J", rowIndex);
 			matchColor(row.getCell(25).toString(), "Z", rowIndex);
+			
+			// Check missing attributes
+			checkMissingAttributes(row, rowIndex);
 		}
 	}
 }

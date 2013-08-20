@@ -21,30 +21,26 @@ public class ValidatePointSymbolizer extends CommonValidator{
 
 		if (printFormatError() == false) {
 			checkModifiedHeader();
-			checkStyleID();
-			checkColorValid();
-			checkMissingAttributes();
+			performChecks();
 			printValueError();
 		} 
 	}
 
-	public void checkStyleID() {
+	public void performChecks() {
 
 		for (int rowIndex = 4; rowIndex <= pointSheet.getLastRowNum(); rowIndex++) {
 
-			checkIDAndDuplicate('P', "F", rowIndex, 5);
-		}
-	}
-
-	public void checkColorValid() {
-
-		int rowIndex;
-		
-		for (rowIndex = 4; rowIndex <= pointSheet.getLastRowNum(); rowIndex++) {
-
 			Row row = pointSheet.getRow(rowIndex);
+			
+			// Check valid ID and duplicate
+			checkIDAndDuplicate('P', "F", rowIndex, 5);
+			
+			// Check color valid
 			matchColor(row.getCell(15).toString(), "P", rowIndex);
 			matchColor(row.getCell(23).toString(), "X", rowIndex);
+			
+			// Check missing attributes
+			checkMissingAttributes(row, rowIndex);
 		}
 	}
 }

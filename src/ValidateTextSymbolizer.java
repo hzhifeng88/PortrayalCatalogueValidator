@@ -21,30 +21,25 @@ public class ValidateTextSymbolizer extends CommonValidator {
 
 		if (printFormatError() == false) {
 			checkModifiedHeader();
-			checkStyleID();
-			checkColorValid();
-			checkMissingAttributes();
+			performChecks();
 			printValueError();
 		}
 	}
-
-	public void checkStyleID() {
+	
+	public void performChecks() {
 
 		for (int rowIndex = 4; rowIndex <= textSheet.getLastRowNum(); rowIndex++) {
-			
-			checkIDAndDuplicate('T', "F", rowIndex, 5);
-		}
-	}
-
-	public void checkColorValid() {
-
-		int rowIndex;
-
-		for (rowIndex = 4; rowIndex <= textSheet.getLastRowNum(); rowIndex++) {
 
 			Row row = textSheet.getRow(rowIndex);
-			matchColor(row.getCell(19).toString(),"T", rowIndex);
-
+			
+			// Check valid ID and duplicate
+			checkIDAndDuplicate('T', "F", rowIndex, 5);
+			
+			// Check color valid
+			matchColor(row.getCell(19).toString(), "T", rowIndex);
+			
+			// Check missing attributes
+			checkMissingAttributes(row, rowIndex);
 		}
 	}
 }

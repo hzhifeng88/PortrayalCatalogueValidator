@@ -51,11 +51,9 @@ public class ValidateColors extends CommonValidator {
 			
 			if(row.getCell(1) != null){
 				String tempString = row.getCell(1).toString();
-				
 				checkLineBreak(tempString, "B", rowIndex);
 
 				if (!tempString.equalsIgnoreCase("")) {
-
 					if (isRGB(tempString) == false) {
 						storeInvalidColorRGB.add("B" + Integer.toString(rowIndex + 1));
 					}

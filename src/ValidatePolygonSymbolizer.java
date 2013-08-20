@@ -21,30 +21,26 @@ public class ValidatePolygonSymbolizer extends CommonValidator{
 
 		if (printFormatError() == false) {
 			checkModifiedHeader();
-			checkStyleID();
-			checkColorValid();
-			checkMissingAttributes();
+			performChecks();
 			printValueError();
 		}
 	}
-
-	public void checkStyleID() {
+	
+	public void performChecks() {
 
 		for (int rowIndex = 4; rowIndex <= polygonSheet.getLastRowNum(); rowIndex++) {
 
-			checkIDAndDuplicate('A', "F", rowIndex, 5);
-		}
-	}
-	
-	public void checkColorValid() {
-
-		int rowIndex;
-
-		for (rowIndex = 4; rowIndex <= polygonSheet.getLastRowNum(); rowIndex++) {
-
 			Row row = polygonSheet.getRow(rowIndex);
+			
+			// Check valid ID and duplicate
+			checkIDAndDuplicate('A', "F", rowIndex, 5);
+			
+			// Check color valid
 			matchColor(row.getCell(10).toString(), "K", rowIndex);
 			matchColor(row.getCell(16).toString(), "Q", rowIndex);
+			
+			// Check missing attributes
+			checkMissingAttributes(row, rowIndex);
 		}
 	}
 }
