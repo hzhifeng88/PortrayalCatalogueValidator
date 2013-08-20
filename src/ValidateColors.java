@@ -46,12 +46,17 @@ public class ValidateColors extends CommonValidator {
 		for (int rowIndex = 4; rowIndex <= colorSheet.getLastRowNum(); rowIndex++) {
 			
 			Row row = colorSheet.getRow(rowIndex);
-			String tempString = row.getCell(1).toString();
+			
+			if(row.getCell(1) != null){
+				String tempString = row.getCell(1).toString();
+				
+				checkLineBreak(tempString, "B", rowIndex);
 
-			if (!tempString.equalsIgnoreCase("")) {
+				if (!tempString.equalsIgnoreCase("")) {
 
-				if (isRGB(tempString) == false) {
-					storeInvalidColorRGB.add("B" + Integer.toString(rowIndex + 1));
+					if (isRGB(tempString) == false) {
+						storeInvalidColorRGB.add("B" + Integer.toString(rowIndex + 1));
+					}
 				}
 			}
 		}

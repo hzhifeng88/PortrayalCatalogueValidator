@@ -23,6 +23,7 @@ public class CommonValidator {
 	private ArrayList<String> storeEmptyRows = new ArrayList<String>();
 	private ArrayList<String> storeMissingValueCells = new ArrayList<String>();
 	private ArrayList<String> storeInvalidColorCells = new ArrayList<String>();
+	private ArrayList<String> storeLineBreakCells = new ArrayList<String>();
 
 	
 	public CommonValidator(Sheet sheet, HTMLEditorKit kit, HTMLDocument doc){
@@ -101,6 +102,13 @@ public class CommonValidator {
 		}
 	}
 	
+	public void checkLineBreak(String tempString, String column, int rowIndex){
+
+		if(tempString.contains("\n")){
+			storeLineBreakCells.add(column + Integer.toString(rowIndex + 1));
+		}
+	}
+	
 	public void checkIDAndDuplicate(char idAlphabet, String column, int rowIndex, int columnIndex){
 		
 		boolean wrongStyleID = false;
@@ -109,33 +117,38 @@ public class CommonValidator {
 
 		Row row = sheet.getRow(rowIndex);
 
-		String tempString = row.getCell(columnIndex).toString();
+		if(row.getCell(columnIndex) != null){
+			
+			String tempString = row.getCell(columnIndex).toString();
 
-		if (!tempString.equalsIgnoreCase("")) {
+			if (!tempString.equalsIgnoreCase("")) {
+				
+				checkLineBreak(tempString, column, rowIndex);
 
-			char firstChar = tempString.charAt(0);
+				char firstChar = tempString.charAt(0);
 
-			if (firstChar != idAlphabet) {
-				wrongStyleID = true;
-				storeWrongID.add(column + Integer.toString(rowIndex + 1));
-			}
+				if (firstChar != idAlphabet) {
+					wrongStyleID = true;
+					storeWrongID.add(column + Integer.toString(rowIndex + 1));
+				}
 
-			if (wrongStyleID == false) {
+				if (wrongStyleID == false) {
 
-				if (storeRightID.isEmpty() == true) {
-					storeRightID.add(tempString);
-				} else {
-
-					for (int count = 0; count < storeRightID.size(); count++) {
-
-						if (storeRightID.get(count).equalsIgnoreCase(tempString)) {
-							storeDuplicateID.add(column + Integer.toString(rowIndex + 1));
-							foundDuplicate = true;
-						}
-					}
-					
-					if (foundDuplicate == false) {
+					if (storeRightID.isEmpty() == true) {
 						storeRightID.add(tempString);
+					} else {
+
+						for (int count = 0; count < storeRightID.size(); count++) {
+
+							if (storeRightID.get(count).equalsIgnoreCase(tempString)) {
+								storeDuplicateID.add(column + Integer.toString(rowIndex + 1));
+								foundDuplicate = true;
+							}
+						}
+						
+						if (foundDuplicate == false) {
+							storeRightID.add(tempString);
+						}
 					}
 				}
 			}
@@ -161,6 +174,8 @@ public class CommonValidator {
 	
 	public void matchColor(String tempStringColor, String currentColumn, int rowIndex) {
 
+		checkLineBreak(tempStringColor, currentColumn, rowIndex);
+		
 		for (int count = 0; count < storeColorID.size(); count++) {
 			
 			if(tempStringColor.equalsIgnoreCase(storeColorID.get(count))){
@@ -264,6 +279,12 @@ public class CommonValidator {
 				Collections.sort(storeMissingValueCells);
 				kit.insertHTML(doc, doc.getLength(), "<font size = 4> <font color=#0A23C4><b>-> </b><font size = 3> Missing values found (Mandatory)</font color></font>", 0, 0,null);
 				kit.insertHTML(doc, doc.getLength(), "<font size = 3> <font color=#0A23C4>Cells: <font color=#ED0E3F>" + storeMissingValueCells + "</font color></font>", 0, 0, null);
+			}
+			
+			if(storeLineBreakCells.isEmpty() == false){
+				hasError = true;
+				kit.insertHTML(doc, doc.getLength(), "<font size = 4> <font color=#0A23C4><b>-> </b><font size = 3> Cell contains line break</font color></font>", 0, 0,null);
+				kit.insertHTML(doc, doc.getLength(), "<font size = 3> <font color=#0A23C4>Cells: <font color=#ED0E3F>" + storeLineBreakCells + "</font color></font>", 0, 0, null);
 			}
 			
 			if(hasError == false){
