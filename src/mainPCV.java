@@ -15,7 +15,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 public class mainPCV extends JFrame {
 
-	// GUI
+	private boolean countOne = false;
 	private static mainPCV mainWindow;
 	private JPanel northPanel;
 	private JFileChooser chooser;
@@ -27,9 +27,10 @@ public class mainPCV extends JFrame {
 	private JScrollPane scrollPane;
 	private HTMLEditorKit kit;
 	private HTMLDocument doc;
-
+	
 	// ApachePOI (reading of excel)
 	private Workbook workbook;
+	private Workbook originalWorkbook;
 	private ArrayList<String> storeColorID = new ArrayList<String>();
 
 	public mainPCV() {
@@ -131,15 +132,19 @@ public class mainPCV extends JFrame {
 		try {
 
 			workbook = WorkbookFactory.create(new FileInputStream(excelFilePath));
-
+			
+			if(countOne == false){
+				originalWorkbook = workbook;
+				countOne = true;
+			}
+			
 			readColorsSheet();
-
-			new ValidatePointSymbolizer(workbook.getSheetAt(0), storeColorID, kit, doc);
-			new ValidateLineSymbolizer(workbook.getSheetAt(1), storeColorID, kit, doc);
-			new ValidatePolygonSymbolizer(workbook.getSheetAt(2), storeColorID, kit, doc);
-			new ValidateTextSymbolizer(workbook.getSheetAt(3), storeColorID, kit, doc);
-			new ValidateRasterSymbolizer(workbook.getSheetAt(4), kit, doc);
-			new ValidateColors(workbook.getSheetAt(5), kit, doc);
+			new ValidatePointSymbolizer(workbook.getSheetAt(0), originalWorkbook, storeColorID, kit, doc);
+			new ValidateLineSymbolizer(workbook.getSheetAt(1), originalWorkbook, storeColorID, kit, doc);
+			new ValidatePolygonSymbolizer(workbook.getSheetAt(2), originalWorkbook, storeColorID, kit, doc);
+			new ValidateTextSymbolizer(workbook.getSheetAt(3), originalWorkbook, storeColorID, kit, doc);
+			new ValidateRasterSymbolizer(workbook.getSheetAt(4), originalWorkbook, kit, doc);
+			new ValidateColors(workbook.getSheetAt(5), originalWorkbook, kit, doc);
 
 		} catch (InvalidFormatException e) {
 			e.printStackTrace();
@@ -150,8 +155,6 @@ public class mainPCV extends JFrame {
 		}
 	}
 
-	// This function reads in sheet and stores the data(rows) in a object data
-	// structure. 1 Row = 1 Object
 	public void readColorsSheet() {
 
 		Sheet sheet = workbook.getSheetAt(5);

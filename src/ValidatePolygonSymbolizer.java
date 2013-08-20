@@ -1,23 +1,26 @@
 import java.util.ArrayList;
+
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 
 public class ValidatePolygonSymbolizer extends CommonValidator{
 
 	private Sheet polygonSheet;
 
-	public ValidatePolygonSymbolizer(Sheet sheet, ArrayList<String> list , HTMLEditorKit kit, HTMLDocument doc) {
+	public ValidatePolygonSymbolizer(Sheet sheet, Workbook originalWorkbook, ArrayList<String> list , HTMLEditorKit kit, HTMLDocument doc) {
 
-		super(sheet, list, kit, doc);
+		super(sheet, originalWorkbook, list, kit, doc);
 		this.polygonSheet = sheet;
 		
 		checkMergedCells();
 		checkEmptyRows();
 
 		if (printFormatError() == false) {
+			checkModifiedHeader();
 			checkStyleID();
 			checkColorValid();
 			checkMissingAttributes();
@@ -33,7 +36,6 @@ public class ValidatePolygonSymbolizer extends CommonValidator{
 		}
 	}
 	
-	// Column K and Q store color values or references
 	public void checkColorValid() {
 
 		int rowIndex;

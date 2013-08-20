@@ -7,6 +7,7 @@ import javax.swing.text.html.HTMLEditorKit;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 
 public class ValidateColors extends CommonValidator {
 
@@ -15,9 +16,9 @@ public class ValidateColors extends CommonValidator {
 	private HTMLEditorKit kit;
 	private HTMLDocument doc;
 
-	public ValidateColors(Sheet sheet, HTMLEditorKit kit, HTMLDocument doc) {
+	public ValidateColors(Sheet sheet, Workbook originalWorkbook, HTMLEditorKit kit, HTMLDocument doc) {
 
-		super(sheet, kit ,doc);
+		super(sheet,originalWorkbook, kit ,doc);
 		this.colorSheet = sheet;
 		this.kit = kit;
 		this.doc = doc;
@@ -26,6 +27,7 @@ public class ValidateColors extends CommonValidator {
 		checkEmptyRows();
 
 		if (printFormatError() == false) {
+			checkModifiedHeader();
 			checkColorID();
 			checkRGB();
 			printValueError();

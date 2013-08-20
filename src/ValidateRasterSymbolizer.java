@@ -2,20 +2,22 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 
 public class ValidateRasterSymbolizer extends CommonValidator{
 
 	private Sheet rasterSheet;
 
-	public ValidateRasterSymbolizer(Sheet sheet, HTMLEditorKit kit, HTMLDocument doc) {
+	public ValidateRasterSymbolizer(Sheet sheet, Workbook originalWorkbook, HTMLEditorKit kit, HTMLDocument doc) {
 
-		super(sheet, kit, doc);
+		super(sheet,originalWorkbook, kit, doc);
 		this.rasterSheet = sheet;
 		
 		checkMergedCells();
 		checkEmptyRows();
 
 		if (printFormatError() == false) {
+			checkModifiedHeader();
 			checkStyleID();
 			checkMissingAttributes();
 			printValueError();

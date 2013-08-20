@@ -1,23 +1,26 @@
 import java.util.ArrayList;
+
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 
 public class ValidateLineSymbolizer extends CommonValidator{
 
 	private Sheet lineSheet;
 
-	public ValidateLineSymbolizer(Sheet sheet, ArrayList<String> list ,  HTMLEditorKit kit, HTMLDocument doc) {
+	public ValidateLineSymbolizer(Sheet sheet, Workbook originalWorkbook, ArrayList<String> list ,  HTMLEditorKit kit, HTMLDocument doc) {
 
-		super(sheet, list, kit, doc);
+		super(sheet, originalWorkbook, list, kit, doc);
 		this.lineSheet = sheet;
 
 		checkMergedCells();
 		checkEmptyRows();
 		
 		if (printFormatError() == false) {
+			checkModifiedHeader();
 			checkStyleID();
 			checkColorValid();
 			checkMissingAttributes();
@@ -33,7 +36,6 @@ public class ValidateLineSymbolizer extends CommonValidator{
 		}
 	}
 
-	// Column J and Z store color values or references
 	public void checkColorValid() {
 
 		int rowIndex;

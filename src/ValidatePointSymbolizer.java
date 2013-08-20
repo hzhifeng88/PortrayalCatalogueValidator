@@ -1,23 +1,26 @@
 import java.util.ArrayList;
+
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 
 public class ValidatePointSymbolizer extends CommonValidator{
 
 	private Sheet pointSheet;
 
-	public ValidatePointSymbolizer(Sheet pointSheet, ArrayList<String> list, HTMLEditorKit kit, HTMLDocument doc) {
+	public ValidatePointSymbolizer(Sheet pointSheet, Workbook originalWorkbook, ArrayList<String> list, HTMLEditorKit kit, HTMLDocument doc) {
 		
-		super(pointSheet,list, kit, doc);
+		super(pointSheet,originalWorkbook, list, kit, doc);
 		this.pointSheet = pointSheet;
 		
 		checkMergedCells();
 		checkEmptyRows();
 
 		if (printFormatError() == false) {
+			checkModifiedHeader();
 			checkStyleID();
 			checkColorValid();
 			checkMissingAttributes();
@@ -33,7 +36,6 @@ public class ValidatePointSymbolizer extends CommonValidator{
 		}
 	}
 
-	// Column P and X store color values or references
 	public void checkColorValid() {
 
 		int rowIndex;

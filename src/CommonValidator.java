@@ -6,6 +6,7 @@ import javax.swing.text.html.*;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 
 public class CommonValidator {
 
@@ -13,6 +14,7 @@ public class CommonValidator {
 	public boolean hasError = false;
 	private static String hexadecimal = "0123456789abcdefABCDEF";
 	private Sheet sheet;
+	private Workbook originalWorkbook;
 	private HTMLEditorKit kit;
 	private HTMLDocument doc;
 	private ArrayList<String> storeRightID = new ArrayList<String>();
@@ -24,18 +26,20 @@ public class CommonValidator {
 	private ArrayList<String> storeMissingValueCells = new ArrayList<String>();
 	private ArrayList<String> storeInvalidColorCells = new ArrayList<String>();
 	private ArrayList<String> storeLineBreakCells = new ArrayList<String>();
-
+	private ArrayList<String> storeModifiedHeaderCells = new ArrayList<String>();
 	
-	public CommonValidator(Sheet sheet, HTMLEditorKit kit, HTMLDocument doc){
+	public CommonValidator(Sheet sheet, Workbook originalWorkbook, HTMLEditorKit kit, HTMLDocument doc){
 		
 		this.sheet = sheet;	
+		this.originalWorkbook = originalWorkbook;
 		this.kit = kit;
 		this.doc = doc;
 	}
 	
-	public CommonValidator(Sheet sheet, ArrayList<String> list, HTMLEditorKit kit, HTMLDocument doc){
+	public CommonValidator(Sheet sheet, Workbook originalWorkbook, ArrayList<String> list, HTMLEditorKit kit, HTMLDocument doc){
 		
-		this.sheet = sheet;	
+		this.sheet = sheet;
+		this.originalWorkbook = originalWorkbook;
 		this.kit = kit;
 		this.doc = doc;
 		storeColorID = list;
@@ -102,6 +106,50 @@ public class CommonValidator {
 		}
 	}
 	
+	public String columnIndexToLetterNotation(int columnIndex) { 
+  
+		int base = 26;   
+		StringBuffer b = new StringBuffer(); 
+		
+		do {  
+			int digit = columnIndex % base + 65;  
+			b.append(Character.valueOf((char) digit));  
+			columnIndex = (columnIndex / base) - 1; 
+			
+		} while (columnIndex >= 0);   
+		
+		return b.reverse().toString();
+	}
+	
+	public void checkModifiedHeader(){
+		
+		Sheet originalSheet = originalWorkbook.getSheet(sheet.getSheetName());
+		
+		for(int rowIndex = 0; rowIndex < 4; rowIndex++){
+			
+			Row row = sheet.getRow(rowIndex);
+			Row originalRow = originalSheet.getRow(rowIndex);
+			
+			for(int columnIndex = 0; columnIndex < row.getLastCellNum(); columnIndex++){
+				
+				if(row.getCell(columnIndex) == null && originalRow.getCell(columnIndex) == null){
+					continue;
+				}
+
+				if(row.getCell(columnIndex) != null && originalRow.getCell(columnIndex) == null){
+					storeModifiedHeaderCells.add(columnIndexToLetterNotation(columnIndex) + Integer.toString(rowIndex + 1));
+					continue;
+				}
+						
+				if(row.getCell(columnIndex).toString().equalsIgnoreCase(originalRow.getCell(columnIndex).toString())){
+					continue;
+				}else {
+					storeModifiedHeaderCells.add(columnIndexToLetterNotation(columnIndex) + Integer.toString(rowIndex + 1));
+				}
+			}
+		}
+	}
+
 	public void checkLineBreak(String tempString, String column, int rowIndex){
 
 		if(tempString.contains("\n")){
@@ -285,6 +333,13 @@ public class CommonValidator {
 				hasError = true;
 				kit.insertHTML(doc, doc.getLength(), "<font size = 4> <font color=#0A23C4><b>-> </b><font size = 3> Cell contains line break</font color></font>", 0, 0,null);
 				kit.insertHTML(doc, doc.getLength(), "<font size = 3> <font color=#0A23C4>Cells: <font color=#ED0E3F>" + storeLineBreakCells + "</font color></font>", 0, 0, null);
+			}
+			
+			if(storeModifiedHeaderCells.isEmpty() == false){
+				hasError = true;
+				Collections.sort(storeModifiedHeaderCells);
+				kit.insertHTML(doc, doc.getLength(), "<font size = 4> <font color=#0A23C4><b>-> </b><font size = 3> Header cells are modified! </font color></font>", 0, 0,null);
+				kit.insertHTML(doc, doc.getLength(), "<font size = 3> <font color=#0A23C4>Cells: <font color=#ED0E3F>" + storeModifiedHeaderCells + "</font color></font>", 0, 0, null);
 			}
 			
 			if(hasError == false){
