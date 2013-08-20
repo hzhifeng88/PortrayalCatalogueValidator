@@ -5,8 +5,7 @@ import java.awt.event.*;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.text.html.HTMLDocument;
-import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.*;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -31,42 +30,12 @@ public class mainPCV extends JFrame {
 
 	// ApachePOI (reading of excel)
 	private Workbook workbook;
-	private ColorsObject ColorsObject;
-	private LinkedList<ColorsObject> storeColorsObjectList = new LinkedList<ColorsObject>();
+	private ArrayList<String> storeColorID = new ArrayList<String>();
 
 	public mainPCV() {
 
 		createNorthPanel();
-
-		errorPane = new JTextPane();
-		errorPane.setOpaque(false);
-		kit = new HTMLEditorKit();
-		doc = new HTMLDocument();
-		errorPane.setEditorKit(kit);
-		errorPane.setDocument(doc);
-		errorPane.setEditable(false);
-		errorPane.setSize(450, 450);
-		errorPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		
-		JViewport viewport = new JViewport() {
-			
-			public void paintComponent(Graphics og) {
-				super.paintComponent(og);
-				Graphics2D g = (Graphics2D) og;
-				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-						RenderingHints.VALUE_ANTIALIAS_ON);
-				GradientPaint gradient = new GradientPaint(0, 0, new Color(247,
-						237, 204), 0, getHeight(), Color.WHITE, true);
-				g.setPaint(gradient);
-				g.fillRoundRect(0, 0, getWidth(), getHeight(), 50, 50);
-			}
-		};
-		viewport.add(errorPane);
-
-		scrollPane = new JScrollPane();
-		scrollPane
-				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		scrollPane.setViewport(viewport);
+		createSouthPanel();
 		
 		getContentPane().add(northPanel, BorderLayout.NORTH);
 		getContentPane().add(scrollPane, BorderLayout.CENTER);
@@ -96,7 +65,6 @@ public class mainPCV extends JFrame {
 
 		mainWindow.getContentPane();
 		mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
 	}
 
 	public void createNorthPanel() {
@@ -127,6 +95,34 @@ public class mainPCV extends JFrame {
 		chooser = new JFileChooser();
 		chooser.setFileFilter(new FileNameExtensionFilter("Excel Files", "xlsx"));
 	}
+	
+	public void createSouthPanel(){
+		
+		errorPane = new JTextPane();
+		errorPane.setOpaque(false);
+		kit = new HTMLEditorKit();
+		doc = new HTMLDocument();
+		errorPane.setEditorKit(kit);
+		errorPane.setDocument(doc);
+		errorPane.setEditable(false);
+		errorPane.setSize(450, 450);
+		errorPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		
+		JViewport viewport = new JViewport() {
+			public void paintComponent(Graphics og) {
+				super.paintComponent(og);
+				Graphics2D g = (Graphics2D) og;
+				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+				GradientPaint gradient = new GradientPaint(0, 0, new Color(247, 237, 204), 0, getHeight(), Color.WHITE, true);
+				g.setPaint(gradient);
+				g.fillRoundRect(0, 0, getWidth(), getHeight(), 50, 50);
+			}
+		};
+		viewport.add(errorPane);
+		scrollPane = new JScrollPane();
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setViewport(viewport);
+	}
 
 	public void initializeRead() {
 
@@ -134,25 +130,15 @@ public class mainPCV extends JFrame {
 
 		try {
 
-			workbook = WorkbookFactory
-					.create(new FileInputStream(excelFilePath));
+			workbook = WorkbookFactory.create(new FileInputStream(excelFilePath));
 
 			readColorsSheet();
 
-			new ValidatePointSymbolizer(workbook.getSheetAt(0),
-					storeColorsObjectList, kit, doc);
-
-			new ValidateLineSymbolizer(workbook.getSheetAt(1),
-					storeColorsObjectList, kit, doc);
-
-			new ValidatePolygonSymbolizer(workbook.getSheetAt(2),
-					storeColorsObjectList, kit, doc);
-
-			new ValidateTextSymbolizer(workbook.getSheetAt(3),
-					storeColorsObjectList, kit, doc);
-
+			new ValidatePointSymbolizer(workbook.getSheetAt(0), storeColorID, kit, doc);
+			new ValidateLineSymbolizer(workbook.getSheetAt(1), storeColorID, kit, doc);
+			new ValidatePolygonSymbolizer(workbook.getSheetAt(2), storeColorID, kit, doc);
+			new ValidateTextSymbolizer(workbook.getSheetAt(3), storeColorID, kit, doc);
 			new ValidateRasterSymbolizer(workbook.getSheetAt(4), kit, doc);
-
 			new ValidateColors(workbook.getSheetAt(5), kit, doc);
 
 		} catch (InvalidFormatException e) {
@@ -162,27 +148,18 @@ public class mainPCV extends JFrame {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	// This function reads in sheet and stores the data(rows) in a object data
 	// structure. 1 Row = 1 Object
 	public void readColorsSheet() {
 
-		// Get the Colors sheet.
 		Sheet sheet = workbook.getSheetAt(5);
 
 		for (int rowIndex = 4; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
 
 			Row row = sheet.getRow(rowIndex);
-
-			// NOTE: use equalsIgnoreCase("") to check for blank cells if needed
-			ColorsObject = new ColorsObject(row.getCell(0).toString(), row
-					.getCell(1).toString(), row.getCell(2).toString(), row
-					.getCell(3).toString());
-
-			storeColorsObjectList.add(ColorsObject);
-
+			storeColorID.add(row.getCell(0).toString());
 		}
 	}
 
@@ -195,7 +172,7 @@ public class mainPCV extends JFrame {
 				int feedBack = chooser.showOpenDialog(null);
 
 				if (feedBack == JFileChooser.OPEN_DIALOG) {
-
+					
 					excelFilePath = chooser.getSelectedFile().toString();
 					pathTextField.setText(excelFilePath);
 
@@ -205,18 +182,14 @@ public class mainPCV extends JFrame {
 				errorPane.setText("");
 
 				if (excelFilePath == null) {
-					JOptionPane.showMessageDialog(null,
-							"Please select an excel file first!");
+					JOptionPane.showMessageDialog(null,"Please select an excel file first!");
 				} else {
-					String tempString = excelFilePath.substring(
-							excelFilePath.length() - 5, excelFilePath.length());
+					String tempString = excelFilePath.substring(excelFilePath.length() - 5, excelFilePath.length());
 
 					if (tempString.equalsIgnoreCase(".xlsx")) {
 						initializeRead();
 					} else {
-						JOptionPane
-								.showMessageDialog(null,
-										"Could not process selected file. Did you select the right file?");
+						JOptionPane.showMessageDialog(null, "Could not process selected file. Did you select the right file?");
 					}
 				}
 			}
