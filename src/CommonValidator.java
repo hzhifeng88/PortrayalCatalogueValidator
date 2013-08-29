@@ -17,10 +17,10 @@ public class CommonValidator {
 	private Workbook originalWorkbook;
 	private HTMLEditorKit kit;
 	private HTMLDocument doc;
-	private ArrayList<String> storeRightID = new ArrayList<String>();
+	private ArrayList<String> storeRightID = new ArrayList<String>();			//for checking duplicates
 	private ArrayList<String> storeWrongID = new ArrayList<String>();
 	private ArrayList<String> storeDuplicateID = new ArrayList<String>();
-	private ArrayList<String> storeColorID = new ArrayList<String>();
+	private ArrayList<String> storeColorID = new ArrayList<String>();			//for cross referencing
 	private ArrayList<String> storeMergedCells = new ArrayList<String>();
 	private ArrayList<String> storeEmptyRows = new ArrayList<String>();
 	private ArrayList<String> storeMissingValueCells = new ArrayList<String>();
@@ -228,15 +228,19 @@ public class CommonValidator {
 	public void checkMissingAttributes(Row row, int rowIndex){
 		
 		// Checks for mandatory columns here
-		if(row.getCell(0) == null || row.getCell(2).toString().equalsIgnoreCase("")){
+		if(row.getCell(0) == null || row.getCell(0).toString().equalsIgnoreCase("")){
 			storeMissingValueCells.add("A" + Integer.toString(rowIndex + 1));
 		}
 			
+		if(row.getCell(1) == null || row.getCell(1).toString().equalsIgnoreCase("")){
+			storeMissingValueCells.add("B" + Integer.toString(rowIndex + 1));
+		}
+		
 		if(row.getCell(2) == null || row.getCell(2).toString().equalsIgnoreCase("")){
 			storeMissingValueCells.add("C" + Integer.toString(rowIndex + 1));
 		}
 			
-		if(row.getCell(3) == null || row.getCell(2).toString().equalsIgnoreCase("")){
+		if(row.getCell(3) == null || row.getCell(3).toString().equalsIgnoreCase("")){
 			storeMissingValueCells.add("D" + Integer.toString(rowIndex + 1));
 		}
 	}
@@ -246,11 +250,11 @@ public class CommonValidator {
 		try {
 			
 			if(sheet.getSheetName().equalsIgnoreCase("PointSymbolizer")){
-				kit.insertHTML(doc, doc.getLength(), "<font size = 3> <font color=#0A23C4>Error Sheet: <font color=#ED0E3F><b>" + sheet.getSheetName() + "</b></font color></font>", 0, 0, null);
+				kit.insertHTML(doc, doc.getLength(), "<font size = 3> <font color=#0A23C4>Error(s) in sheet: <font color=#ED0E3F><b>" + sheet.getSheetName() + "</b></font color></font>", 0, 0, null);
 			}else{
-				kit.insertHTML(doc, doc.getLength(), "<font size = 3> <font color=#0A23C4><br>Error Sheet: <font color=#ED0E3F><b>" + sheet.getSheetName() + "</b></font color></font>", 0, 0, null);
+				kit.insertHTML(doc, doc.getLength(), "<font size = 3> <font color=#0A23C4><br>Error(s) in sheet: <font color=#ED0E3F><b>" + sheet.getSheetName() + "</b></font color></font>", 0, 0, null);
 			}
-			kit.insertHTML(doc, doc.getLength(), "<font size = 3> <font color=#088542>-------------------------------------- </font color></font>", 0, 0, null);
+			kit.insertHTML(doc, doc.getLength(), "<font size = 3> <font color=#088542>---------------------------------------------- </font color></font>", 0, 0, null);
 		
 			if (storeMergedCells.isEmpty() == true && storeEmptyRows.isEmpty() == true) {
 				return false;

@@ -1,11 +1,7 @@
 import java.util.ArrayList;
-
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
-
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 
 public class ValidateTextSymbolizer extends CommonValidator {
 
@@ -36,7 +32,7 @@ public class ValidateTextSymbolizer extends CommonValidator {
 			checkIDAndDuplicate('T', "F", rowIndex, 5);
 			
 			// Check color valid
-			matchColor(row.getCell(19).toString(), "T", rowIndex);
+			matchColor(row.getCell(21).toString(), "V", rowIndex);
 			
 			// Check missing attributes
 			checkMissingAttributes(row, rowIndex);

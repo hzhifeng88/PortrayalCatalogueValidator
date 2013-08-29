@@ -3,9 +3,7 @@ import java.util.ArrayList;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 
 public class ValidatePolygonSymbolizer extends CommonValidator{
 
@@ -36,8 +34,8 @@ public class ValidatePolygonSymbolizer extends CommonValidator{
 			checkIDAndDuplicate('A', "F", rowIndex, 5);
 			
 			// Check color valid
-			matchColor(row.getCell(10).toString(), "K", rowIndex);
-			matchColor(row.getCell(16).toString(), "Q", rowIndex);
+			matchColor(row.getCell(12).toString(), "M", rowIndex);
+			matchColor(row.getCell(18).toString(), "S", rowIndex);
 			
 			// Check missing attributes
 			checkMissingAttributes(row, rowIndex);

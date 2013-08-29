@@ -1,17 +1,18 @@
 import java.io.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.awt.*;
+import java.awt.Color;
 import java.awt.event.*;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.html.*;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 
 public class mainPCV extends JFrame {
 
@@ -32,6 +33,7 @@ public class mainPCV extends JFrame {
 	private Workbook workbook;
 	private Workbook originalWorkbook;
 	private ArrayList<String> storeColorID = new ArrayList<String>();
+	private ArrayList<String> storeExtraSheets= new ArrayList<String>();
 
 	public mainPCV() {
 
@@ -71,29 +73,25 @@ public class mainPCV extends JFrame {
 	public void createNorthPanel() {
 
 		northPanel = new JPanel();
-		northPanel.setPreferredSize(new Dimension(600, 110));
-		northPanel
-				.setBorder(BorderFactory
-						.createTitledBorder("<html><font size = 4> <font color=#0B612D>Select an Excel File</font color></font></html>"));
+		northPanel.setPreferredSize(new Dimension(600, 80));
+		northPanel.setBorder(BorderFactory.createTitledBorder("<html><font size = 4> <font color=#0B612D>Select an Excel File (only .xlsx extension)</font color></font></html>"));
 
 		pathTextField = new JTextField();
 		pathTextField.setEditable(false);
 		pathTextField.setPreferredSize(new Dimension(400, 30));
 
-		openFileButton = new JButton(" Browse ");
+		openFileButton = new JButton(" ... ");
 		openFileButton.addActionListener(new ButtonHandler());
 
 		validateButton = new JButton(" Validate ");
 		validateButton.addActionListener(new ButtonHandler());
 
-		northPanel
-				.add(new JLabel(
-						"<html><font size = 4> <font color=#0E11F5>File Path:</font color></font></html>"));
 		northPanel.add(pathTextField);
 		northPanel.add(openFileButton);
 		northPanel.add(validateButton);
 
 		chooser = new JFileChooser();
+		chooser.setDialogTitle("Select an Excel File (only .xlsx extension)");
 		chooser.setFileFilter(new FileNameExtensionFilter("Excel Files", "xlsx"));
 	}
 	
@@ -138,6 +136,7 @@ public class mainPCV extends JFrame {
 				countOne = true;
 			}
 			
+			checkExtraSheets();
 			readColorsSheet();
 			new ValidatePointSymbolizer(workbook.getSheetAt(0), originalWorkbook, storeColorID, kit, doc);
 			new ValidateLineSymbolizer(workbook.getSheetAt(1), originalWorkbook, storeColorID, kit, doc);
@@ -152,6 +151,45 @@ public class mainPCV extends JFrame {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	public void checkExtraSheets(){
+		
+		String tempSheetName;
+		storeExtraSheets.clear();
+		
+		for(int countSheet = 0; countSheet < workbook.getNumberOfSheets(); countSheet++){
+			
+			Sheet tempSheet = workbook.getSheetAt(countSheet);
+			tempSheetName = tempSheet.getSheetName();
+			
+			  switch(tempSheetName) {
+	            case "PointSymbolizer": 
+	            	break;
+	            case "LineSymbolizer":  
+	            	break;
+	            case "PolygonSymbolizer":  
+	            	break;
+	            case "TextSymbolizer": 
+	            	break;
+	            case "RasterSymbolizer": 
+	            	break;
+	            case "Colors": 
+	            	break;	   
+	            default: storeExtraSheets.add(tempSheetName);
+	                break;
+	        }
+		}
+		
+		try {
+			if(storeExtraSheets.isEmpty() == false){
+				kit.insertHTML(doc, doc.getLength(), "<font size = 3> <font color=#0A23C4>Extra sheets found: <font color=#088542>" + storeExtraSheets + "<br><br></font color></font>", 0, 0, null);
+			}
+		} catch (BadLocationException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
 	}
 
@@ -175,7 +213,6 @@ public class mainPCV extends JFrame {
 				int feedBack = chooser.showOpenDialog(null);
 
 				if (feedBack == JFileChooser.OPEN_DIALOG) {
-					
 					excelFilePath = chooser.getSelectedFile().toString();
 					pathTextField.setText(excelFilePath);
 
@@ -190,6 +227,18 @@ public class mainPCV extends JFrame {
 					String tempString = excelFilePath.substring(excelFilePath.length() - 5, excelFilePath.length());
 
 					if (tempString.equalsIgnoreCase(".xlsx")) {
+									
+						DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+						Date date = new Date();
+
+						try {
+							kit.insertHTML(doc, doc.getLength(), "<font size = 3> <font color=#0A23C4>Last validated: <font color=#088542>" + dateFormat.format(date) + "<br></font color></font>", 0, 0, null);
+						} catch (BadLocationException e1) {
+							e1.printStackTrace();
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+							
 						initializeRead();
 					} else {
 						JOptionPane.showMessageDialog(null, "Could not process selected file. Did you select the right file?");
