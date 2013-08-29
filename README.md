@@ -20,7 +20,5 @@ Specifications implemented:
 
 7. Sheets should not contains any empty rolls (null or blank). 
 
+8. Added check for extra sheets.
 
-Other notes:
-
-1. Applications can only accept.xlsx extension. But could not handle wrong .xlsx file.
