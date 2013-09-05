@@ -8,10 +8,6 @@ Specifications implemented:
 
 3. Implement format check for Colors Sheet sRGB column. 
 
-* Values must begin with '#' 
-* Have a length of 7 (inclusive of '#') 
-* Values must be Hexadecimal (from position 1) 
-
 4. Each line should contain values (no cell grouping). 
 
 5. Cells shouldn’t contain newlines (no line breaks). 
