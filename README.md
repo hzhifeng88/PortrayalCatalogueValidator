@@ -18,3 +18,6 @@ Specifications implemented:
 
 8. Added check for extra sheets.
 
+Catalog to CartoCSS
+===========================
+
