@@ -16,18 +16,27 @@ import org.apache.poi.ss.usermodel.*;
 
 public class mainPCV extends JFrame {
 
-	private boolean countOne = false;
 	private static mainPCV mainWindow;
+	private boolean countOne = false;
+	private boolean hasValidated = false;
 	private JPanel northPanel;
 	private JFileChooser chooser;
 	private String excelFilePath;
 	private JButton openFileButton;
 	private JButton validateButton;
+	private JButton exportCSSButton;
 	private JTextField pathTextField;
 	private JTextPane errorPane;
 	private JScrollPane scrollPane;
 	private HTMLEditorKit kit;
 	private HTMLDocument doc;
+	
+	private ValidatePointSymbolizer pointSymbolizer;
+	private ValidateLineSymbolizer lineSymbolizer;
+	private ValidatePolygonSymbolizer polygonSymbolizer;
+	private ValidateTextSymbolizer textSymbolizer;
+	private ValidateRasterSymbolizer rasterSymbolizer;
+	private ValidateColors colorSymbolizer;
 	
 	// ApachePOI (reading of excel)
 	private Workbook workbook;
@@ -47,9 +56,7 @@ public class mainPCV extends JFrame {
 	public static void main(String[] args) {
 
 		try {
-			UIManager
-					.setLookAndFeel("com.jtattoo.plaf.texture.TextureLookAndFeel");
-
+			UIManager.setLookAndFeel("com.jtattoo.plaf.texture.TextureLookAndFeel");
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
@@ -73,7 +80,7 @@ public class mainPCV extends JFrame {
 	public void createNorthPanel() {
 
 		northPanel = new JPanel();
-		northPanel.setPreferredSize(new Dimension(600, 80));
+		northPanel.setPreferredSize(new Dimension(600, 100));
 		northPanel.setBorder(BorderFactory.createTitledBorder("<html><font size = 4> <font color=#0B612D>Select an Excel File (only .xlsx extension)</font color></font></html>"));
 
 		pathTextField = new JTextField();
@@ -85,10 +92,14 @@ public class mainPCV extends JFrame {
 
 		validateButton = new JButton(" Validate ");
 		validateButton.addActionListener(new ButtonHandler());
+		
+		exportCSSButton = new JButton(" Export to CartoCSS ");
+		exportCSSButton.addActionListener(new ButtonHandler());
 
 		northPanel.add(pathTextField);
 		northPanel.add(openFileButton);
 		northPanel.add(validateButton);
+		northPanel.add(exportCSSButton);
 
 		chooser = new JFileChooser();
 		chooser.setDialogTitle("Select an Excel File (only .xlsx extension)");
@@ -123,12 +134,15 @@ public class mainPCV extends JFrame {
 		scrollPane.setViewport(viewport);
 	}
 
+	public void enableWindows() {
+		mainWindow.setEnabled(true);    
+	} 
+	   
 	public void initializeRead() {
 
 		workbook = null;
 
 		try {
-
 			workbook = WorkbookFactory.create(new FileInputStream(excelFilePath));
 			
 			if(countOne == false){
@@ -138,13 +152,13 @@ public class mainPCV extends JFrame {
 			
 			checkExtraSheets();
 			readColorsSheet();
-			new ValidatePointSymbolizer(workbook.getSheetAt(0), originalWorkbook, storeColorID, kit, doc);
-			new ValidateLineSymbolizer(workbook.getSheetAt(1), originalWorkbook, storeColorID, kit, doc);
-			new ValidatePolygonSymbolizer(workbook.getSheetAt(2), originalWorkbook, storeColorID, kit, doc);
-			new ValidateTextSymbolizer(workbook.getSheetAt(3), originalWorkbook, storeColorID, kit, doc);
-			new ValidateRasterSymbolizer(workbook.getSheetAt(4), originalWorkbook, kit, doc);
-			new ValidateColors(workbook.getSheetAt(5), originalWorkbook, kit, doc);
-
+			
+			pointSymbolizer = new ValidatePointSymbolizer(workbook.getSheetAt(0), originalWorkbook, storeColorID, kit, doc);
+			lineSymbolizer = new ValidateLineSymbolizer(workbook.getSheetAt(1), originalWorkbook, storeColorID, kit, doc);
+			polygonSymbolizer = new ValidatePolygonSymbolizer(workbook.getSheetAt(2), originalWorkbook, storeColorID, kit, doc);
+			textSymbolizer = new ValidateTextSymbolizer(workbook.getSheetAt(3), originalWorkbook, storeColorID, kit, doc);
+			rasterSymbolizer = new ValidateRasterSymbolizer(workbook.getSheetAt(4), originalWorkbook, kit, doc);
+			colorSymbolizer = new ValidateColors(workbook.getSheetAt(5), originalWorkbook, kit, doc);
 		} catch (InvalidFormatException e) {
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
@@ -154,7 +168,7 @@ public class mainPCV extends JFrame {
 		}
 	}
 
-	public void checkExtraSheets(){
+	public void checkExtraSheets() {
 		
 		String tempSheetName;
 		storeExtraSheets.clear();
@@ -204,6 +218,49 @@ public class mainPCV extends JFrame {
 		}
 	}
 
+	public void exportToCartoCSS() {
+		
+		// Display export status
+		mainWindow.setEnabled(false);   
+		
+		ExportReport cartoReport = new ExportReport(mainWindow);
+		
+		cartoReport.writeHeader("PointSymbolizer");
+		if(pointSymbolizer.getHasError() == true || colorSymbolizer.getHasError() == true){
+			cartoReport.writeTextToReport("Unable to export! Sheet contains error(s).");
+		}else {
+			
+		}
+		
+		cartoReport.writeHeader("LineSymbolizer");
+		if(lineSymbolizer.getHasError() == true || colorSymbolizer.getHasError() == true){
+			cartoReport.writeTextToReport("Unable to export! Sheet contains error(s).");
+		}else {
+			new LineToCartoCSS(workbook.getSheetAt(1), cartoReport, workbook.getSheetAt(5));
+		}
+		
+		cartoReport.writeHeader("PolygonSymbolizer");
+		if(polygonSymbolizer.getHasError() == true || colorSymbolizer.getHasError() == true){
+			cartoReport.writeTextToReport("Unable to export! Sheet contains error(s).");
+		}else {
+			
+		}
+		
+		cartoReport.writeHeader("TextSymbolizer");
+		if(textSymbolizer.getHasError() == true || colorSymbolizer.getHasError() == true){
+			cartoReport.writeTextToReport("Unable to export! Sheet contains error(s).");
+		}else {
+			new TextToCartoCSS(workbook.getSheetAt(3), cartoReport, workbook.getSheetAt(5));
+		}
+		
+		cartoReport.writeHeader("RasterSymbolizer");
+		if(rasterSymbolizer.getHasError() == true || colorSymbolizer.getHasError() == true){
+			cartoReport.writeTextToReport("Unable to export! Sheet contains error(s).");
+		}else {
+			new RasterToCartoCSS(workbook.getSheetAt(4), cartoReport);
+		}
+	}
+	
 	private class ButtonHandler implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
@@ -218,7 +275,7 @@ public class mainPCV extends JFrame {
 
 				}
 			} else if (e.getSource() == validateButton) {
-
+				hasValidated =  true;
 				errorPane.setText("");
 
 				if (excelFilePath == null) {
@@ -244,6 +301,12 @@ public class mainPCV extends JFrame {
 						JOptionPane.showMessageDialog(null, "Could not process selected file. Did you select the right file?");
 					}
 				}
+			} else if(e.getSource() == exportCSSButton) {
+				
+				if(hasValidated == true){
+					exportToCartoCSS();
+				}
+				
 			}
 		}
 	}

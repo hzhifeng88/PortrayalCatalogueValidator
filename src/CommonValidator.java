@@ -45,6 +45,38 @@ public class CommonValidator {
 		storeColorID = list;
 	}
 	
+	public boolean getHasError() {
+		return hasError;
+	}
+	
+	public int findColumnIndex(String columnName) {
+		
+		Row tempRow = sheet.getRow(2);
+		
+		for(int countColumn = 0; countColumn < tempRow.getLastCellNum(); countColumn++) {
+			
+			if(columnName.equalsIgnoreCase(tempRow.getCell(countColumn).toString())) {
+				return countColumn;
+			}
+		}
+		return -1;
+	}
+	
+	public String columnIndexToLetter(int columnIndex) { 
+		  
+		int base = 26;   
+		StringBuffer b = new StringBuffer(); 
+		
+		do {  
+			int digit = columnIndex % base + 65;  
+			b.append(Character.valueOf((char) digit));  
+			columnIndex = (columnIndex / base) - 1; 
+			
+		} while (columnIndex >= 0);   
+		
+		return b.reverse().toString();
+	}
+	
 	public void checkMergedCells() {
 
 		String cellNumber;
@@ -104,21 +136,6 @@ public class CommonValidator {
 				System.out.println("Blank row: " + Integer.toString(rowCount + 1));
 			}
 		}
-	}
-	
-	public String columnIndexToLetter(int columnIndex) { 
-  
-		int base = 26;   
-		StringBuffer b = new StringBuffer(); 
-		
-		do {  
-			int digit = columnIndex % base + 65;  
-			b.append(Character.valueOf((char) digit));  
-			columnIndex = (columnIndex / base) - 1; 
-			
-		} while (columnIndex >= 0);   
-		
-		return b.reverse().toString();
 	}
 	
 	public void checkModifiedHeader(){
@@ -196,7 +213,7 @@ public class CommonValidator {
 		}
 	}
 	
-	public boolean isRGB(String tempStringColor) {	
+	public boolean checkIsRGB(String tempStringColor) {	
 		
 		if (tempStringColor.charAt(0) != '#'){
 			return false;	
@@ -219,7 +236,7 @@ public class CommonValidator {
 		
 		if(storeColorID.contains(tempStringColor)){
 			return;
-		}else if(isRGB(tempStringColor) == true){
+		}else if(checkIsRGB(tempStringColor) == true){
 			return;
 		}
 		storeInvalidColorCells.add(currentColumn + Integer.toString(rowIndex + 1));
@@ -227,7 +244,7 @@ public class CommonValidator {
 	
 	public void checkMissingAttributes(Row row, int rowIndex){
 		
-		// Checks for mandatory columns here
+		// Checks for mandatory columns here (for symbolizers only)
 		if(row.getCell(0) == null || row.getCell(0).toString().equalsIgnoreCase("")){
 			storeMissingValueCells.add("A" + Integer.toString(rowIndex + 1));
 		}
@@ -242,6 +259,14 @@ public class CommonValidator {
 			
 		if(row.getCell(3) == null || row.getCell(3).toString().equalsIgnoreCase("")){
 			storeMissingValueCells.add("D" + Integer.toString(rowIndex + 1));
+		}
+		
+		if(row.getCell(5) == null || row.getCell(5).toString().equalsIgnoreCase("")){
+			storeMissingValueCells.add("F" + Integer.toString(rowIndex + 1));
+		}
+		
+		if(row.getCell(9) == null || row.getCell(9).toString().equalsIgnoreCase("")){
+			storeMissingValueCells.add("J" + Integer.toString(rowIndex + 1));
 		}
 	}
 

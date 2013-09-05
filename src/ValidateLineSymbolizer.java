@@ -6,6 +6,7 @@ import org.apache.poi.ss.usermodel.*;
 public class ValidateLineSymbolizer extends CommonValidator{
 
 	private Sheet lineSheet;
+	private boolean sheetCorrect = false;
 
 	public ValidateLineSymbolizer(Sheet sheet, Workbook originalWorkbook, ArrayList<String> list ,  HTMLEditorKit kit, HTMLDocument doc) {
 
@@ -19,7 +20,17 @@ public class ValidateLineSymbolizer extends CommonValidator{
 			checkModifiedHeader();
 			performChecks();
 			printValueError();
+			
+			if(getHasError() == false){
+				sheetCorrect = true;
+			}else {
+				sheetCorrect = false;
+			}
 		}
+	}
+	
+	public boolean isSheetCorrect() {
+		return sheetCorrect;
 	}
 	
 	public void performChecks() {
@@ -32,8 +43,12 @@ public class ValidateLineSymbolizer extends CommonValidator{
 			checkIDAndDuplicate('L', "F", rowIndex, 5);
 			
 			// Check color valid
-			matchColor(row.getCell(11).toString(), "L", rowIndex);
-			matchColor(row.getCell(27).toString(), "AB", rowIndex);
+			if(row.getCell(11) != null && !row.getCell(11).toString().equalsIgnoreCase("")) {
+				matchColor(row.getCell(11).toString(), "L", rowIndex);
+			}
+			if(row.getCell(27) != null && !row.getCell(27).toString().equalsIgnoreCase("")) {
+				matchColor(row.getCell(27).toString(), "AB", rowIndex);
+			}
 			
 			// Check missing attributes
 			checkMissingAttributes(row, rowIndex);

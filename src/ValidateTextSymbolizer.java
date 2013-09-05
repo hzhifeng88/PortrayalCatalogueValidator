@@ -6,6 +6,7 @@ import org.apache.poi.ss.usermodel.*;
 public class ValidateTextSymbolizer extends CommonValidator {
 
 	private Sheet textSheet;
+	private boolean sheetCorrect = false;
 
 	public ValidateTextSymbolizer(Sheet sheet, Workbook originalWorkbook, ArrayList<String> list,  HTMLEditorKit kit, HTMLDocument doc) {
 
@@ -19,7 +20,17 @@ public class ValidateTextSymbolizer extends CommonValidator {
 			checkModifiedHeader();
 			performChecks();
 			printValueError();
+			
+			if(getHasError() == false){
+				sheetCorrect = true;
+			}else {
+				sheetCorrect = false;
+			}
 		}
+	}
+	
+	public boolean isSheetCorrect() {
+		return sheetCorrect;
 	}
 	
 	public void performChecks() {
@@ -32,7 +43,9 @@ public class ValidateTextSymbolizer extends CommonValidator {
 			checkIDAndDuplicate('T', "F", rowIndex, 5);
 			
 			// Check color valid
-			matchColor(row.getCell(21).toString(), "V", rowIndex);
+			if(row.getCell(21) != null && !row.getCell(21).toString().equalsIgnoreCase("")) {
+				matchColor(row.getCell(21).toString(), "V", rowIndex);
+			}
 			
 			// Check missing attributes
 			checkMissingAttributes(row, rowIndex);

@@ -9,6 +9,7 @@ public class ValidateColors extends CommonValidator {
 
 	private Sheet colorSheet;
 	private ArrayList<String> storeInvalidColorRGB = new ArrayList<String>();
+	private boolean sheetCorrect = false;
 	private HTMLEditorKit kit;
 	private HTMLDocument doc;
 
@@ -28,30 +29,52 @@ public class ValidateColors extends CommonValidator {
 			checkRGB();
 			printValueError();
 			printRGBError();
+			
+			if(getHasError() == false){
+				sheetCorrect = true;
+			}else {
+				sheetCorrect = false;
+			}
 		}
+	}
+	
+	public boolean isSheetCorrect() {
+		return sheetCorrect;
 	}
 
 	public void checkColorID() {
 
+		int tempColumnIndex = findColumnIndex("Color Id");
+		String columnLetter = columnIndexToLetter(tempColumnIndex);
+		
 		for (int rowIndex = 4; rowIndex <= colorSheet.getLastRowNum(); rowIndex++) {
 			
-			checkIDAndDuplicate('C', "A", rowIndex, 0);
+			
+			
+			if(tempColumnIndex != -1) {
+				checkIDAndDuplicate('C', columnLetter, rowIndex, tempColumnIndex);
+			}else {
+				System.out.println("Color ID column NOT found!");
+			}
 		}
 	}
 
 	public void checkRGB() {
 		
+		int tempColumnIndex = findColumnIndex("sRGB");
+		String columnLetter = columnIndexToLetter(tempColumnIndex);
+		
 		for (int rowIndex = 4; rowIndex <= colorSheet.getLastRowNum(); rowIndex++) {
 			
 			Row row = colorSheet.getRow(rowIndex);
 			
-			if(row.getCell(1) != null){
+			if(row.getCell(1) != null && tempColumnIndex != -1){
 				String tempString = row.getCell(1).toString();
-				checkLineBreak(tempString, "B", rowIndex);
+				checkLineBreak(tempString,columnLetter, rowIndex);
 
 				if (!tempString.equalsIgnoreCase("")) {
-					if (isRGB(tempString) == false) {
-						storeInvalidColorRGB.add("B" + Integer.toString(rowIndex + 1));
+					if (checkIsRGB(tempString) == false) {
+						storeInvalidColorRGB.add(columnLetter + Integer.toString(rowIndex + 1));
 					}
 				}
 			}

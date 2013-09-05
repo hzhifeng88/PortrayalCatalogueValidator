@@ -8,6 +8,7 @@ import org.apache.poi.ss.usermodel.*;
 public class ValidatePolygonSymbolizer extends CommonValidator{
 
 	private Sheet polygonSheet;
+	private boolean sheetCorrect = false;
 
 	public ValidatePolygonSymbolizer(Sheet sheet, Workbook originalWorkbook, ArrayList<String> list , HTMLEditorKit kit, HTMLDocument doc) {
 
@@ -21,7 +22,17 @@ public class ValidatePolygonSymbolizer extends CommonValidator{
 			checkModifiedHeader();
 			performChecks();
 			printValueError();
+			
+			if(getHasError() == false){
+				sheetCorrect = true;
+			}else {
+				sheetCorrect = false;
+			}
 		}
+	}
+	
+	public boolean isSheetCorrect() {
+		return sheetCorrect;
 	}
 	
 	public void performChecks() {
@@ -34,8 +45,12 @@ public class ValidatePolygonSymbolizer extends CommonValidator{
 			checkIDAndDuplicate('A', "F", rowIndex, 5);
 			
 			// Check color valid
-			matchColor(row.getCell(12).toString(), "M", rowIndex);
-			matchColor(row.getCell(18).toString(), "S", rowIndex);
+			if(row.getCell(12) != null && !row.getCell(12).toString().equalsIgnoreCase("")) {
+				matchColor(row.getCell(12).toString(), "M", rowIndex);
+			}
+			if(row.getCell(18) != null && !row.getCell(18).toString().equalsIgnoreCase("")) {
+				matchColor(row.getCell(18).toString(), "S", rowIndex);
+			}
 			
 			// Check missing attributes
 			checkMissingAttributes(row, rowIndex);

@@ -5,6 +5,7 @@ import org.apache.poi.ss.usermodel.*;
 public class ValidateRasterSymbolizer extends CommonValidator{
 
 	private Sheet rasterSheet;
+	private boolean sheetCorrect = false;
 
 	public ValidateRasterSymbolizer(Sheet sheet, Workbook originalWorkbook, HTMLEditorKit kit, HTMLDocument doc) {
 
@@ -18,7 +19,17 @@ public class ValidateRasterSymbolizer extends CommonValidator{
 			checkModifiedHeader();
 			performChecks();
 			printValueError();
+			
+			if(getHasError() == false){
+				sheetCorrect = true;
+			}else {
+				sheetCorrect = false;
+			}
 		}
+	}
+	
+	public boolean isSheetCorrect() {
+		return sheetCorrect;
 	}
 
 	public void performChecks() {
